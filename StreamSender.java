@@ -5,7 +5,7 @@ import java.util.*;
 
 public class StreamSender extends Thread{
 	
-	  private Queue<StreamElement> sendQueue;
+	  private Queue<StreamElement> sendQueue = new LinkedList<StreamElement>();
 	  private Socket clientSocket;
 	  private ObjectOutputStream out_to_Server;
 	  
@@ -24,21 +24,29 @@ public class StreamSender extends Thread{
 	}
 	
 	public void run(){
-		while(true)
-		{
+		
 			try {
 			
 				ArrayList<StreamElement> elements = popElements(); // this may block if nothing is in sendQueue
-				out_to_Server.writeObject(elements);
+				int n = elements.size();
+                for(int i = 0; i < n ; i++)
+                	{
+                	   
+                	    out_to_Server.writeObject(elements.get( i ));
+                	}
+
+				//out_to_Server.writeObject(elements);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		
 		
 	}
 	
 	public synchronized void pushElement(StreamElement elem) {
+		System.out.println( elem.getTimestamp() + " : " + elem.getSeq());
+
         sendQueue.add(elem);
         notifyAll();  // Wake up this thread
     }
@@ -51,7 +59,7 @@ public class StreamSender extends Thread{
 					e.printStackTrace();
 				}  	
 	    	}
-	    	
+	    	System.out.println("Queue is not empty...");
 	    	ArrayList<StreamElement> ret = new ArrayList<StreamElement>();	
 	    	while(!sendQueue.isEmpty())
 	    	{
