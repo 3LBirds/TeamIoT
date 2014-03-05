@@ -1,9 +1,13 @@
 
-public class StreamElement {
+public class StreamElement implements java.io.Serializable {
 
 	 private long timestamp; // unix timestamp
 	 private long seq; // sequence number
 	 private byte[] data; // this is the user data
+	 
+	 public StreamElement(){
+		 
+	 }
 	 
 	 public StreamElement( long timestamp, long seq, byte[] data)
 	 {
