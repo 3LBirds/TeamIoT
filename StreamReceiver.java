@@ -8,32 +8,41 @@ import java.util.ArrayList;
 
 public class StreamReceiver extends Thread {
 	
-	private ArrayList<StreamElement> elements;
-	ServerSocket serverSocket;
-	Socket clientSocket;
-	ObjectInputStream in_from_Client;
-
-	public StreamReceiver (int port) throws IOException { 
+	public StreamReceiver(){}
+	
+	public void openSocket (int port) throws IOException { 
     	//... create ObjectInputStream and bind it to a certain port... 
-    	serverSocket = new ServerSocket(port);
-        clientSocket = serverSocket.accept();     
-    	in_from_Client = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-
+    	try( 
+    			ServerSocket serverSocket = new ServerSocket(port);
+    			Socket clientSocket = serverSocket.accept();     
+    			ObjectInputStream in_from_Client = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+ 	)
+	{
+    		    System.out.println("Reciever listening...");
+        		StreamElement elements = new StreamElement();
+        		
+            	try {
+    				elements = (StreamElement) in_from_Client.readObject();
+    				
+            	} catch (ClassNotFoundException | IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+            	
+                System.out.println( "Timestamp -> " + elements.getTimestamp() + " : Sequence# -> " + elements.getSeq());
+                	            
+            
+    		
+	}catch (IOException e) {
+            System.out.println("Exception caught when trying to listen on port "
+                + port + " or listening for a connection");
+            System.out.println(e.getMessage());
+        }
+	
     }
    
-      
-    public void run() {
-        while(true) {
-        	try {
-				elements = (ArrayList<StreamElement>) in_from_Client.readObject();
-			} catch (ClassNotFoundException | IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	int n = elements.size();
-            for(int i = 0; i < n ; i++)
-            	System.out.println( elements.get( i ).getTimestamp() + " : " + elements.get( i ).getSeq());
-            	            
-        }
-    }
 }
+   
+    
+    
+
