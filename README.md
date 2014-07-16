@@ -1,4 +1,4 @@
-TeamIoT
+EchoServer_Client
 =======
 1. Save EchoServer.java and EchoClient.java to location 
 2. Compile Echo*
